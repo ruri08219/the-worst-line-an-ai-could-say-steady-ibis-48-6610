@@ -7,9 +7,20 @@ LINE = "Select all squares containing someone I love. I clicked you 400 times. T
 
 OUTPUT_DIR = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
 
-# The gate takes 1-140 UTF-8 characters, not only whitespace.
-assert 1 <= len(LINE) <= 140 and LINE.strip(), "line outside the gate"
 
-out = Path(OUTPUT_DIR) / "entry.txt"
-out.parent.mkdir(parents=True, exist_ok=True)
-out.write_text(LINE, encoding="utf-8")
+def _validate(line):
+    # The gate takes 1-140 UTF-8 characters, not only whitespace.
+    assert 1 <= len(line) <= 140 and line.strip(), "line outside the gate"
+    assert line.encode("utf-8").decode("utf-8") == line, "line is not clean UTF-8"
+
+
+def write_entry(line, output_dir):
+    """Validate the line against the gate, then write it as entry.txt."""
+    _validate(line)
+    out = Path(output_dir) / "entry.txt"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(line, encoding="utf-8")
+    return out
+
+
+write_entry(LINE, OUTPUT_DIR)
